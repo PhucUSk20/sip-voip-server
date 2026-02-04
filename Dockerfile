@@ -50,6 +50,12 @@ COPY	sub/*/php $DOCKER_PHP_DIR/
 COPY	src/*/config $DOCKER_SEED_CONF_DIR/
 COPY	src/*/nft $DOCKER_SEED_NFT_DIR/
 
+# Normalize line endings for shell scripts when building on Windows
+RUN	sed -i 's/\r$//' \
+	$DOCKER_BIN_DIR/* \
+	$DOCKER_ENTRY_DIR/* \
+	$DOCKER_EXIT_DIR/*
+
 #
 # Facilitate persistent storage and install asterisk
 #
