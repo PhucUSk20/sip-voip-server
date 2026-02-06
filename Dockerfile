@@ -46,7 +46,8 @@ COPY	src/*/bin $DOCKER_BIN_DIR/
 COPY	src/*/entry.d $DOCKER_ENTRY_DIR/
 COPY	src/*/exit.d $DOCKER_EXIT_DIR/
 COPY	src/*/php $DOCKER_PHP_DIR/
-COPY	sub/*/php $DOCKER_PHP_DIR/
+# Disabled (LAN-only): WebSMS/AutoBan PHP deps from sub/
+# COPY	sub/*/php $DOCKER_PHP_DIR/
 COPY	src/*/config $DOCKER_SEED_CONF_DIR/
 COPY	src/*/nft $DOCKER_SEED_NFT_DIR/
 
@@ -70,10 +71,11 @@ RUN	source docker-common.sh \
 	$DOCKER_NFT_DIR \
 	$DOCKER_SPOOL_DIR \
 	&& mkdir -p $DOCKER_ACME_SSL_DIR \
-	&& ln -sf $DOCKER_PHP_DIR/autoban.php $DOCKER_BIN_DIR/autoban \
-	&& ln -sf $DOCKER_PHP_DIR/websms.php $DOCKER_BIN_DIR/websms \
 	&& apk --no-cache --update add \
 	asterisk
+# Disabled (LAN-only): WebSMS/AutoBan helpers
+# && ln -sf $DOCKER_PHP_DIR/autoban.php $DOCKER_BIN_DIR/autoban \
+# && ln -sf $DOCKER_PHP_DIR/websms.php $DOCKER_BIN_DIR/websms
 
 #
 # Entrypoint, how container is run
@@ -115,9 +117,10 @@ RUN	apk --no-cache --update add \
 	"syslogd -nO- -l$SYSLOG_LEVEL $SYSLOG_OPTIONS" \
 	"crond -f -c /etc/crontabs" \
 	"-q asterisk -pf" \
-	"-n websmsd php -S 0.0.0.0:$WEBSMSD_PORT -t $DOCKER_PHP_DIR websmsd.php" \
-	"$DOCKER_PHP_DIR/autoband.php" \
 	&& mkdir -p /var/spool/asterisk/staging
+# Disabled (LAN-only): WebSMS/AutoBan services
+# "-n websmsd php -S 0.0.0.0:$WEBSMSD_PORT -t $DOCKER_PHP_DIR websmsd.php" \
+# "$DOCKER_PHP_DIR/autoband.php" \
 
 #
 # Have runit's runsvdir start all services
